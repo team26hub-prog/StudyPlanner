@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+
+/vendor/
+/node_modules/
+/cache/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Local app files
+*.log

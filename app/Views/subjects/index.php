@@ -1,0 +1,9 @@
+<section class="page-heading compact-heading"><div><p class="eyebrow">ORGANIZE YOUR LEARNING</p><h1>Your <span>subjects.</span></h1><p class="heading-copy">Keep related tasks together and see each subject's progress.</p></div><a class="primary-button heading-action" href="<?= e(url('/subjects/create')) ?>">+ Add a subject</a></section>
+<?php if ($error): ?><p class="error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
+<?php if ($subjects === []): ?>
+    <section class="empty-state"><span class="empty-symbol" aria-hidden="true">+</span><h3>No subjects yet</h3><p>Create a subject such as Biology, History, or Calculus to organize your study tasks.</p><a class="primary-button" href="<?= e(url('/subjects/create')) ?>">Create your first subject</a></section>
+<?php else: ?>
+    <section class="subject-grid" aria-label="All subjects">
+        <?php foreach ($subjects as $subject): ?><article class="subject-card" style="--subject-color: <?= e($subject['color']) ?>"><span class="subject-card-mark" aria-hidden="true"></span><div class="subject-card-body"><p class="eyebrow">SUBJECT</p><h2><a href="<?= e(url('/subjects/' . $subject['id'])) ?>"><?= e($subject['name']) ?></a></h2><p class="subject-description"><?= e($subject['description'] ?: 'No description yet.') ?></p></div><div class="subject-card-footer"><span><?= (int) $subject['task_count'] ?> tasks <span class="dot-separator">·</span> <?= (int) $subject['completed_count'] ?> completed</span><a class="quiet-link" href="<?= e(url('/subjects/' . $subject['id'])) ?>">Details</a></div></article><?php endforeach; ?>
+    </section>
+<?php endif; ?>
