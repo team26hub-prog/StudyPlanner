@@ -1,5 +1,12 @@
 Options -Indexes
+
+<FilesMatch "^\.(?!well-known)">
+    Require all denied
+</FilesMatch>
+
 RewriteEngine On
+
+RewriteRule ^(config|db|storage)(/|$) - [F,L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

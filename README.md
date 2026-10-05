@@ -10,7 +10,7 @@ A native PHP and MySQL study planner organized with MVC. It includes account reg
 ## Run locally
 
 1. Put this folder under Laragon's `www` directory and start Apache and MySQL.
-2. For a new install, import `db/schema.sql` into MySQL using HeidiSQL or phpMyAdmin. For the original starter database, run `db/migrations/001_add_accounts_subjects_and_task_status.sql` once instead; it retains old task rows as unassigned legacy data. Then run migrations `002_add_activity_logs.sql` and `003_add_exams.sql` once to add the activity log and exam tables.
+2. For a new install, run `php setup.php` from this directory to create the database and tables from `db/schema.sql`. For the original starter database, run `db/migrations/001_add_accounts_subjects_and_task_status.sql` once instead; it retains old task rows as unassigned legacy data. Then run migrations `002_add_activity_logs.sql` and `003_add_exams.sql` once to add the activity log and exam tables.
 3. If your local database credentials differ from Laragon defaults, set `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in the Apache/PHP environment.
 4. Create your first regular account at `http://localhost/studyplanner/signup`.
 5. To create an admin account, set `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` (12-72 characters, including uppercase and lowercase letters, a number, and a symbol) in the terminal environment, then run `php db/create_admin.php`. Admin is not selectable on public signup.
@@ -28,6 +28,7 @@ The app uses Laragon's common local defaults: `127.0.0.1:3306`, database `studyp
 - `public/assets/` contains frontend CSS and JavaScript.
 - `config/database.php` reads DB settings from environment variables with Laragon defaults.
 - `db/schema.sql` creates the users, subjects, tasks, exams, and activity log tables.
+- `setup.php` applies the full schema from the command line for a fresh install; it is not accessible over HTTP.
 - Existing databases can add exams with `db/migrations/003_add_exams.sql`.
 - `db/migrations/` upgrades existing database schemas without deleting existing rows.
 - `db/create_admin.php` creates an admin using environment-provided credentials and is CLI-only.
