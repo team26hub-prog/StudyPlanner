@@ -24,7 +24,7 @@ final class AuthController extends Controller
         $email = input_email($_POST, 'email');
         $password = input_password($_POST, 'password');
 
-        if ($email === '' || strlen($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email === '' || text_length($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->render('auth/login', ['error' => 'Enter a valid email address.']);
             return;
         }
@@ -71,11 +71,11 @@ final class AuthController extends Controller
         $password = input_password($_POST, 'password');
         $passwordConfirmation = input_password($_POST, 'password_confirmation');
 
-        if (strlen($name) < 2 || strlen($name) > 100) {
+        if (text_length($name) < 2 || text_length($name) > 100) {
             $this->render('auth/register', ['error' => 'Enter a name between 2 and 100 characters.']);
             return;
         }
-        if ($email === '' || strlen($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email === '' || text_length($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $this->render('auth/register', ['error' => 'Enter a valid email address no longer than 190 characters.']);
             return;
         }
@@ -103,6 +103,7 @@ final class AuthController extends Controller
             'role' => 'user',
         ];
         (new ActivityLog())->record($_SESSION['user'], 'auth.registered', 'Registered a new account.');
+        flash('success', 'Your account has been created successfully.');
         redirect('/');
     }
 

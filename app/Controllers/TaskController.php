@@ -14,8 +14,8 @@ final class TaskController extends Controller
     public function index(): void
     {
         $user = $this->requireRole('user');
-        $status = sanitize_text_value(input_string($_GET, 'status'));
-        $subjectFilter = sanitize_text_value(input_string($_GET, 'subject_id'));
+        $status = input_string($_GET, 'status');
+        $subjectFilter = input_string($_GET, 'subject_id');
         $filters = [
             'status' => in_array($status, ['pending', 'in_progress', 'completed'], true) ? $status : '',
             'subject_id' => ctype_digit($subjectFilter) ? (int) $subjectFilter : null,
@@ -95,7 +95,7 @@ final class TaskController extends Controller
         if ($task === null) {
             $this->notFound();
         }
-        $status = sanitize_text_value(input_string($_POST, 'status'));
+        $status = input_string($_POST, 'status');
         if (!in_array($status, ['pending', 'in_progress', 'completed'], true)) {
             flash('error', 'Choose a valid task status.');
             redirect('/tasks');
@@ -125,22 +125,34 @@ final class TaskController extends Controller
     {
         $title = sanitize_text_value(input_string($_POST, 'title'));
         $description = sanitize_text_value(input_string($_POST, 'description'));
-        $priority = sanitize_text_value(input_string($_POST, 'priority', 'medium'));
-        $status = sanitize_text_value(input_string($_POST, 'status', 'pending'));
-        $subjectId = sanitize_text_value(input_string($_POST, 'subject_id'));
-        $dueDate = sanitize_text_value(input_string($_POST, 'due_date'));
+        $priority = input_string($_POST, 'priority');
+        $status = input_string($_POST, 'status');
+        $subjectId = input_string($_POST, 'subject_id');
+        $dueDate = input_string($_POST, 'due_date');
 
-        if ($title === '' || strlen($title) > 180 || strlen($description) > 2000) {
-            flash('error', 'Enter a task title up to 180 characters and a description under 2,000 characters.');
+        if (text_length($title) < 2 || text_length($title) > 180) {
+            flash('error', 'Enter a task name between 2 and 180 characters.');
             return null;
         }
-        if (!in_array($priority, ['low', 'medium', 'high'], true) || !in_array($status, ['pending', 'in_progress', 'completed'], true)) {
-            flash('error', 'Choose a valid priority and status.');
+        if (text_length($description) > 2000) {
+            flash('error', 'Keep task notes to 2,000 characters or fewer.');
+            return null;
+        }
+        if (!in_array($priority, ['low', 'medium', 'high'], true)) {
+            flash('error', 'Choose a valid task priority.');
+            return null;
+        }
+        if (!in_array($status, ['pending', 'in_progress', 'completed'], true)) {
+            flash('error', 'Choose a valid task status.');
             return null;
         }
         if ($dueDate !== '') {
+            if (!preg_match('/\A\d{4}-\d{2}-\d{2}\z/D', $dueDate)) {
+                flash('error', 'Enter a valid deadline.');
+                return null;
+            }
             $parsedDate = \DateTime::createFromFormat('!Y-m-d', $dueDate);
-            if ($parsedDate === false || $parsedDate->format('Y-m-d') !== $dueDate) {
+            if ($parsedDate === false || $parsedDate->format('Y-m-d') !== $dueDate || (int) substr($dueDate, 0, 4) < 1000) {
                 flash('error', 'Enter a valid deadline.');
                 return null;
             }

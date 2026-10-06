@@ -107,9 +107,13 @@ final class SubjectController extends Controller
     {
         $name = sanitize_text_value(input_string($_POST, 'name'));
         $description = sanitize_text_value(input_string($_POST, 'description'));
-        $color = input_string($_POST, 'color', '#26745c');
-        if ($name === '' || strlen($name) > 100 || strlen($description) > 1000) {
-            flash('error', 'Enter a subject name up to 100 characters and a description under 1,000 characters.');
+        $color = input_string($_POST, 'color');
+        if (text_length($name) < 2 || text_length($name) > 100) {
+            flash('error', 'Enter a subject name between 2 and 100 characters.');
+            return null;
+        }
+        if (text_length($description) > 1000) {
+            flash('error', 'Keep the subject description to 1,000 characters or fewer.');
             return null;
         }
         if ((new Subject())->nameExistsForUser($ownerId, $name, $exceptId)) {

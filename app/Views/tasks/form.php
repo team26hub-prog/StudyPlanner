@@ -3,7 +3,7 @@
     <?php if ($error): ?><p class="error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
     <form class="editor-form" method="post" action="<?= e($formAction) ?>">
         <?= csrf_field() ?>
-        <label for="title">Task name</label><input id="title" name="title" type="text" minlength="1" maxlength="180" value="<?= e($task['title'] ?? '') ?>" placeholder="e.g. Review chapter 4" required>
+        <label for="title">Task name</label><input id="title" name="title" type="text" minlength="2" maxlength="180" value="<?= e($task['title'] ?? '') ?>" placeholder="e.g. Review chapter 4" required>
         <label for="description">Notes <span class="optional">Optional</span></label><textarea id="description" name="description" maxlength="2000" rows="4" placeholder="What do you want to cover?"><?= e($task['description'] ?? '') ?></textarea>
         <div class="form-grid-three">
             <div><label for="subject_id">Subject</label><select id="subject_id" name="subject_id"><option value="">No subject</option><?php foreach ($subjects as $subject): ?><option value="<?= (int) $subject['id'] ?>" <?= (string) ($task['subject_id'] ?? '') === (string) $subject['id'] ? 'selected' : '' ?>><?= e($subject['name']) ?></option><?php endforeach; ?></select></div>

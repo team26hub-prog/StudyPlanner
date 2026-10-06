@@ -10,6 +10,7 @@ class Controller
     {
         $data['currentUser'] = current_user();
         $data['notice'] = flash('notice');
+        $data['success'] = $data['success'] ?? flash('success');
         $data['error'] = $data['error'] ?? flash('error');
         extract($data, EXTR_SKIP);
         ob_start();

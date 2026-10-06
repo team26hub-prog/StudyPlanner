@@ -8,6 +8,7 @@
 </section>
 
 <section class="content-section exam-section">
+    <?php if ($error): ?><p class="error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
     <div class="section-heading">
         <div><p class="eyebrow">YOUR SCHEDULE</p><h2><?= count($exams) ?> <?= count($exams) === 1 ? 'exam' : 'exams' ?></h2></div>
     </div>
@@ -29,7 +30,7 @@
                     <form class="exam-status-form" method="post" action="<?= e(url('/exams/' . $exam['id'] . '/status')) ?>">
                         <?= csrf_field() ?>
                         <label class="visually-hidden" for="exam-status-<?= (int) $exam['id'] ?>">Status for <?= e($exam['title']) ?></label>
-                        <select id="exam-status-<?= (int) $exam['id'] ?>" name="status" class="status-pill status-<?= e($exam['status']) ?>" onchange="this.form.submit()">
+                        <select id="exam-status-<?= (int) $exam['id'] ?>" name="status" class="status-pill status-<?= e($exam['status']) ?>" onchange="this.form.requestSubmit()">
                             <option value="scheduled" <?= $exam['status'] === 'scheduled' ? 'selected' : '' ?>>Scheduled</option>
                             <option value="completed" <?= $exam['status'] === 'completed' ? 'selected' : '' ?>>Completed</option>
                             <option value="missed" <?= $exam['status'] === 'missed' ? 'selected' : '' ?>>Missed</option>

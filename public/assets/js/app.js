@@ -16,24 +16,194 @@ document.querySelectorAll('[data-auto-dismiss]').forEach((notice) => {
     }, Math.max(0, duration - fadeDuration));
 });
 
-document.querySelectorAll('[data-password-confirmation]').forEach((form) => {
+document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+    const field = document.getElementById(toggle.dataset.passwordToggle);
+    if (!field) return;
+
+    toggle.addEventListener('click', () => {
+        const showing = field.type === 'password';
+        field.type = showing ? 'text' : 'password';
+        toggle.setAttribute('aria-pressed', String(showing));
+        toggle.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+    });
+});
+
+const validationMessageFor = (field, form) => {
+    const value = field.type === 'password' ? field.value : field.value.trim();
+    const label = field.labels?.[0]?.textContent.replace(/\s*Optional\s*/i, '').trim()
+        || field.closest('fieldset')?.querySelector('legend')?.textContent.trim()
+        || 'This field';
     const password = form.querySelector('[name="password"]');
-    const confirmation = form.querySelector('[name="password_confirmation"]');
 
-    if (!password || !confirmation) {
-        return;
+    if (field.name === 'password_confirmation' && password && field.value !== password.value) {
+        return 'Passwords do not match. Please enter the same password in both fields.';
     }
+    if (field.required && !value && field.type !== 'radio') {
+        if (field.type === 'email') return 'Enter your email address.';
+        return `${label} is required.`;
+    }
+    if (field.type === 'radio' && field.required && !form.querySelector(`[name="${CSS.escape(field.name)}"]:checked`)) {
+        return `Please choose ${label.toLowerCase()}.`;
+    }
+    if (field.type === 'email' && value && !field.validity.valid) {
+        return 'Enter a valid email address.';
+    }
+    if (field.tagName === 'SELECT' && ![...field.options].some((option) => option.value === field.value)) {
+        return `Choose a valid ${label.toLowerCase()}.`;
+    }
+    if ((field.type === 'date' || field.type === 'datetime-local') && value && Number(value.slice(0, 4)) < 1000) {
+        return `${label} must use a year from 1000 onward.`;
+    }
+    if (field.validity.tooShort) {
+        return `${label} must be at least ${field.minLength} characters.`;
+    }
+    if (field.validity.tooLong) {
+        return `${label} must be no more than ${field.maxLength} characters.`;
+    }
+    if (field.validity.patternMismatch) {
+        return field.title || `${label} does not meet the required format.`;
+    }
+    if (field.validity.badInput || !field.validity.valid) {
+        return `${label} is not valid. Please check the value.`;
+    }
+    return '';
+};
 
-    const validateConfirmation = () => {
-        confirmation.setCustomValidity(
-            confirmation.value !== '' && confirmation.value !== password.value
-                ? 'Passwords do not match.'
-                : ''
-        );
+document.querySelectorAll('form').forEach((form) => {
+    const fields = [...form.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), textarea, select')];
+    if (!fields.length || form.hasAttribute('data-confirm')) return;
+    form.noValidate = true;
+    const attempted = new WeakSet();
+
+    const validateField = (field, showMessage = true) => {
+        // A radio group has one shared error and only needs its first input checked.
+        if (field.type === 'radio' && form.querySelectorAll(`[name="${CSS.escape(field.name)}"]`)[0] !== field) return '';
+        const message = validationMessageFor(field, form);
+        const errorTarget = field.type === 'radio' ? field.closest('fieldset') : field;
+        let error = errorTarget.parentElement.querySelector(`.field-validation-message[data-for="${CSS.escape(field.name)}"]`);
+        if (!error) {
+            error = document.createElement('span');
+            error.className = 'field-validation-message';
+            error.dataset.for = field.name;
+            error.id = `validation-${field.id || field.name.replace(/[^a-z0-9_-]/gi, '-')}`;
+            errorTarget.insertAdjacentElement('afterend', error);
+        }
+        error.textContent = showMessage ? message : '';
+        error.hidden = !showMessage || !message;
+        if (field.type === 'radio') {
+            errorTarget.setAttribute('aria-invalid', String(Boolean(showMessage && message)));
+        } else {
+            field.setAttribute('aria-invalid', String(Boolean(showMessage && message)));
+            const describedBy = (field.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean).filter((id) => id !== error.id);
+            if (showMessage && message) describedBy.push(error.id);
+            if (describedBy.length) field.setAttribute('aria-describedby', describedBy.join(' '));
+            else field.removeAttribute('aria-describedby');
+        }
+        return message;
     };
 
-    password.addEventListener('input', validateConfirmation);
-    confirmation.addEventListener('input', validateConfirmation);
+    fields.forEach((field) => {
+        const currentField = field.type === 'radio'
+            ? form.querySelector(`[name="${CSS.escape(field.name)}"]`)
+            : field;
+        const validateAsUserEdits = () => {
+            attempted.add(currentField);
+            validateField(currentField);
+            if (field.name === 'password') {
+                const confirmation = form.querySelector('[name="password_confirmation"]');
+                if (confirmation && (confirmation.value !== '' || attempted.has(confirmation))) {
+                    attempted.add(confirmation);
+                    validateField(confirmation);
+                }
+            }
+        };
+        field.addEventListener('input', validateAsUserEdits);
+        field.addEventListener('change', validateAsUserEdits);
+        field.addEventListener('blur', () => {
+            attempted.add(field);
+            validateField(field);
+        });
+    });
+
+    form.addEventListener('submit', async (event) => {
+        const invalid = [];
+        fields.forEach((field) => {
+            attempted.add(field);
+            const message = validateField(field);
+            if (message && (field.type !== 'radio' || !invalid.some((item) => item.field.name === field.name))) {
+                invalid.push({ field, message });
+            }
+        });
+        if (!invalid.length) return;
+
+        event.preventDefault();
+        const firstInvalid = invalid[0];
+        firstInvalid.field.focus();
+        const detail = invalid.length === 1
+            ? firstInvalid.message
+            : `${firstInvalid.message} There are ${invalid.length - 1} more field${invalid.length === 2 ? '' : 's'} to review.`;
+        if (window.Swal) {
+            await window.Swal.fire({
+                icon: 'warning',
+                title: 'Please check your information',
+                text: detail,
+                confirmButtonText: 'Review form',
+                confirmButtonColor: '#23775f'
+            });
+            firstInvalid.field.focus();
+        } else {
+            window.alert(detail);
+        }
+    });
+});
+
+const serverError = document.querySelector('.error-message[role="alert"]');
+if (serverError?.textContent.trim()) {
+    const message = serverError.textContent.trim();
+    if (window.Swal) {
+        serverError.hidden = true;
+        window.Swal.fire({
+            icon: 'error',
+            title: 'Please check your information',
+            text: message,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#23775f'
+        });
+    }
+}
+
+const signupSuccess = document.querySelector('[data-swal-success]');
+if (signupSuccess?.textContent.trim() && window.Swal) {
+    signupSuccess.hidden = true;
+    window.Swal.fire({
+        icon: 'success',
+        title: 'Account created',
+        text: signupSuccess.textContent.trim(),
+        confirmButtonText: 'Continue',
+        confirmButtonColor: '#23775f'
+    });
+}
+
+document.querySelectorAll('form[action$="/logout"]').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        let confirmed = false;
+        if (window.Swal) {
+            const result = await window.Swal.fire({
+                icon: 'question',
+                title: 'Sign out?',
+                text: 'Are you sure you want to sign out?',
+                showCancelButton: true,
+                confirmButtonText: 'Sign out',
+                cancelButtonText: 'Stay signed in',
+                confirmButtonColor: '#23775f'
+            });
+            confirmed = result.isConfirmed;
+        } else {
+            confirmed = window.confirm('Are you sure you want to sign out?');
+        }
+        if (confirmed) HTMLFormElement.prototype.submit.call(form);
+    });
 });
 
 const menuToggle = document.querySelector('.menu-toggle');

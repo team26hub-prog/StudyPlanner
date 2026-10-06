@@ -125,18 +125,22 @@ final class ExamController extends Controller
         $title = sanitize_text_value(input_string($_POST, 'title'));
         $subjectId = input_string($_POST, 'subject_id');
         $examAt = input_string($_POST, 'exam_at');
-        $status = input_string($_POST, 'status', 'scheduled');
+        $status = input_string($_POST, 'status');
 
-        if ($title === '' || strlen($title) > 120) {
-            flash('error', 'Enter an exam name up to 120 characters.');
+        if (text_length($title) < 2 || text_length($title) > 120) {
+            flash('error', 'Enter an exam name between 2 and 120 characters.');
             return null;
         }
         if (!ctype_digit($subjectId) || (int) $subjectId < 1 || (new Subject())->findForUser((int) $subjectId, $user) === null) {
             flash('error', 'Choose one of your subjects for this exam.');
             return null;
         }
+        if (!preg_match('/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}\z/D', $examAt)) {
+            flash('error', 'Enter a valid exam date and time.');
+            return null;
+        }
         $parsedDate = \DateTime::createFromFormat('!Y-m-d\TH:i', $examAt);
-        if ($parsedDate === false || $parsedDate->format('Y-m-d\TH:i') !== $examAt) {
+        if ($parsedDate === false || $parsedDate->format('Y-m-d\TH:i') !== $examAt || (int) substr($examAt, 0, 4) < 1000) {
             flash('error', 'Enter a valid exam date and time.');
             return null;
         }

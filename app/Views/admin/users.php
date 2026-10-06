@@ -17,10 +17,10 @@
             <label for="email">Email</label>
             <input id="email" name="email" type="email" maxlength="190" autocomplete="email" required>
             <label for="password">Temporary password</label>
-            <input id="password" name="password" type="password" minlength="8" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,72}" title="Use 8-72 characters with uppercase and lowercase letters, a number, and a symbol." aria-describedby="password-hint" autocomplete="new-password" required>
+            <div class="password-field-control"><input id="password" name="password" type="password" minlength="8" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,72}" title="Use 8-72 characters with uppercase and lowercase letters, a number, and a symbol." aria-describedby="password-hint" autocomplete="new-password" required><button class="password-visibility-toggle" type="button" data-password-toggle="password" aria-controls="password" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m4 4 16 16"/></svg></button></div>
             <small id="password-hint" class="field-hint">Use 8-72 characters with uppercase and lowercase letters, a number, and a symbol.</small>
             <label for="password_confirmation">Confirm password</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" maxlength="72" autocomplete="new-password" required>
+            <div class="password-field-control"><input id="password_confirmation" name="password_confirmation" type="password" maxlength="72" autocomplete="new-password" required><button class="password-visibility-toggle" type="button" data-password-toggle="password_confirmation" aria-controls="password_confirmation" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m4 4 16 16"/></svg></button></div>
             <p class="form-footnote">The password is stored as a secure hash. The new account will have the standard user role.</p>
             <div class="form-actions"><button class="primary-button" type="submit">Create user</button></div>
         </form>

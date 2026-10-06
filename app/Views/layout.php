@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>StudyPlanner</title>
     <link rel="stylesheet" href="<?= e(url('/public/assets/css/app.css')) ?>">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="<?= e(url('/public/assets/js/app.js')) ?>" defer></script>
 </head>
 <body>
@@ -27,20 +28,6 @@
                             <button class="text-button signout-button" type="submit">Sign out</button>
                         </form>
                     </div>
-                </div>
-                <div class="mobile-topbar admin-mobile-topbar">
-                    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Toggle navigation">
-                        <span></span><span></span><span></span>
-                    </button>
-                    <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile navigation">
-                        <div class="mobile-user-row">
-                            <span class="account-name"><?= e($currentUser['name']) ?> <small><?= e(ucfirst($currentUser['role'])) ?></small></span>
-                            <form method="post" action="<?= e(url('/logout')) ?>">
-                                <?= csrf_field() ?>
-                                <button class="mobile-signout-button" type="submit">Sign out</button>
-                            </form>
-                        </div>
-                    </nav>
                 </div>
             <?php else: ?>
                 <div class="mobile-topbar app-mobile-topbar">
@@ -78,16 +65,33 @@
                     <div class="admin-sidebar-heading">
                         <span class="admin-sidebar-mark">S</span>
                         <div><strong>StudyPlanner</strong><span class="admin-sidebar-kicker">ADMIN WORKSPACE</span></div>
+                        <button class="menu-toggle app-menu-toggle admin-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open navigation">
+                            <span></span><span></span><span></span>
+                        </button>
+                        <button class="app-nav-backdrop" type="button" aria-label="Close navigation" tabindex="-1"></button>
+                        <nav id="mobile-nav" class="mobile-nav app-mobile-nav admin-mobile-nav" aria-label="Admin navigation">
+                            <div class="app-mobile-nav-heading"><span>Admin navigation</span><button class="app-mobile-close" type="button" aria-label="Close navigation">×</button></div>
+                            <a class="<?= $currentPath === '/admin' ? 'is-active' : '' ?>" href="<?= e(url('/admin')) ?>" <?= $currentPath === '/admin' ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg><span>Overview</span></a>
+                            <a class="<?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'is-active' : '' ?>" href="<?= e(url('/admin/manage-users')) ?>" <?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Manage users</span></a>
+                            <a class="<?= $currentPath === '/admin/activity' ? 'is-active' : '' ?>" href="<?= e(url('/admin/activity')) ?>" <?= $currentPath === '/admin/activity' ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 3 6-7"/></svg><span>Activity log</span></a>
+                            <div class="mobile-user-row">
+                                <span class="account-name"><?= e($currentUser['name']) ?> <small><?= e(ucfirst($currentUser['role'])) ?></small></span>
+                                <form method="post" action="<?= e(url('/logout')) ?>">
+                                    <?= csrf_field() ?>
+                                    <button class="mobile-signout-button" type="submit">Sign out</button>
+                                </form>
+                            </div>
+                        </nav>
                     </div>
                     <nav class="admin-sidebar-nav" aria-label="Admin pages">
                         <a class="<?= $currentPath === '/admin' ? 'is-active' : '' ?>" href="<?= e(url('/admin')) ?>" <?= $currentPath === '/admin' ? 'aria-current="page"' : '' ?>>
-                            <span class="admin-nav-index">01</span><span>Overview</span>
+                            <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg><span>Overview</span>
                         </a>
                         <a class="<?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'is-active' : '' ?>" href="<?= e(url('/admin/manage-users')) ?>" <?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'aria-current="page"' : '' ?>>
-                            <span class="admin-nav-index">02</span><span>Manage users</span>
+                            <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Manage users</span>
                         </a>
                         <a class="<?= $currentPath === '/admin/activity' ? 'is-active' : '' ?>" href="<?= e(url('/admin/activity')) ?>" <?= $currentPath === '/admin/activity' ? 'aria-current="page"' : '' ?>>
-                            <span class="admin-nav-index">03</span><span>Activity log</span>
+                            <svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 3 6-7"/></svg><span>Activity log</span>
                         </a>
                     </nav>
                     <div class="admin-sidebar-account">
@@ -97,9 +101,15 @@
                 </aside>
                     <div class="admin-content">
                         <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
+                        <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
                         <?= $content ?>
                     </div>
             </div>
+            <nav class="admin-mobile-quick-actions" aria-label="Admin pages">
+                <a class="<?= $currentPath === '/admin' ? 'is-active' : '' ?>" href="<?= e(url('/admin')) ?>" <?= $currentPath === '/admin' ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg><span>Overview</span></a>
+                <a class="<?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'is-active' : '' ?>" href="<?= e(url('/admin/manage-users')) ?>" <?= $currentPath === '/admin/manage-users' || str_starts_with($currentPath, '/admin/users/') ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Manage users</span></a>
+                <a class="<?= $currentPath === '/admin/activity' ? 'is-active' : '' ?>" href="<?= e(url('/admin/activity')) ?>" <?= $currentPath === '/admin/activity' ? 'aria-current="page"' : '' ?>><svg class="admin-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 3 6-7"/></svg><span>Activity log</span></a>
+            </nav>
         <?php elseif ($currentUser): ?>
             <div class="app-layout">
                 <aside class="app-sidebar" aria-label="Main navigation">
@@ -124,6 +134,7 @@
                 </aside>
                 <div class="app-content">
                     <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
+                    <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
                     <?= $content ?>
                 </div>
             </div>
@@ -135,6 +146,7 @@
             </nav>
         <?php else: ?>
                 <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
+                <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
             <?= $content ?>
         <?php endif; ?>
     </main>

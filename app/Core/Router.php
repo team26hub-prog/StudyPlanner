@@ -41,7 +41,11 @@ final class Router
     private function add(string $method, string $path, array $action): void
     {
         $quotedPath = preg_quote($path, '~');
-        $pattern = preg_replace('/\\\\\{([a-zA-Z][a-zA-Z0-9_]*)\\\\\}/', '(?P<$1>[^/]+)', $quotedPath);
+        $pattern = preg_replace_callback(
+            '/\\\\\{([a-zA-Z][a-zA-Z0-9_]*)\\\\\}/',
+            static fn (array $match): string => '(?P<' . $match[1] . '>' . ($match[1] === 'id' ? '[1-9][0-9]*' : '[^/]+') . ')',
+            $quotedPath
+        );
         $this->routes[] = [$method, '~^' . $pattern . '$~', $action];
     }
 }

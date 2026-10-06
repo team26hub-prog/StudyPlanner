@@ -16,7 +16,7 @@
         <form class="editor-form" method="post" action="<?= e($formAction) ?>">
             <?= csrf_field() ?>
             <label for="title">Exam name</label>
-            <input id="title" name="title" type="text" minlength="1" maxlength="120" value="<?= e($exam['title'] ?? '') ?>" placeholder="e.g. Biology midterm" required>
+            <input id="title" name="title" type="text" minlength="2" maxlength="120" value="<?= e($exam['title'] ?? '') ?>" placeholder="e.g. Biology midterm" required>
 
             <label for="subject_id">Subject</label>
             <select id="subject_id" name="subject_id" required>

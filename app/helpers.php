@@ -8,13 +8,27 @@ function sanitize_text_value(?string $value): string
         return '';
     }
 
+    if (preg_match('//u', $value) !== 1) {
+        $value = function_exists('iconv') ? (iconv('UTF-8', 'UTF-8//IGNORE', $value) ?: '') : '';
+    }
+
     $value = trim($value);
     $value = preg_replace('/[\x00-\x1F\x7F]+/u', '', $value) ?? $value;
     $value = strip_tags($value);
     $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
     $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $value = strip_tags($value);
 
     return trim($value);
+}
+
+function text_length(string $value): int
+{
+    if (preg_match_all('/./us', $value, $matches) !== false) {
+        return count($matches[0]);
+    }
+
+    return strlen($value);
 }
 
 function sanitize_email_value(?string $value): string
@@ -74,22 +88,11 @@ function flash(string $key, ?string $message = null): ?string
 
 function input_string(array $source, string $key, string $default = ''): string
 {
-    $value = $source[$key] ?? $default;
-    if (is_string($value)) {
-        return sanitize_text_value($value);
+    if (!array_key_exists($key, $source)) {
+        return $default;
     }
 
-    if (is_scalar($value)) {
-        return sanitize_text_value((string) $value);
-    }
-
-    return $default;
-}
-
-function input_password(array $source, string $key, string $default = ''): string
-{
-    $value = $source[$key] ?? $default;
-
+    $value = $source[$key];
     if (is_string($value)) {
         return trim($value);
     }
@@ -98,7 +101,27 @@ function input_password(array $source, string $key, string $default = ''): strin
         return trim((string) $value);
     }
 
-    return $default;
+    // Force malformed array/object input to fail ordinary field length/enum rules.
+    return str_repeat('x', 4096);
+}
+
+function input_password(array $source, string $key, string $default = ''): string
+{
+    if (!array_key_exists($key, $source)) {
+        return $default;
+    }
+
+    $value = $source[$key];
+
+    if (is_string($value)) {
+        return $value;
+    }
+
+    if (is_scalar($value)) {
+        return (string) $value;
+    }
+
+    return str_repeat('x', 1025);
 }
 
 function input_email(array $source, string $key): string
