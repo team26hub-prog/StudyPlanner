@@ -12,3 +12,6 @@ Thumbs.db
 
 
 *.log
+setup.php
+/storage/
+error_log
