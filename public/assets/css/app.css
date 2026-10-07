@@ -838,3 +838,28 @@ h1 { font-size: 54px; }
     .admin-activity-date { white-space: normal; }
     .admin-activity-table .role-badge { justify-self: start; max-width: 100%; white-space: normal; }
 }
+
+@media (max-width: 760px) {
+    .admin-overview-heading, .admin-overview-stats, .admin-overview-directory { width: 100%; max-width: 100%; min-width: 0; }
+    .admin-overview-heading .heading-copy { max-width: 100%; overflow-wrap: anywhere; }
+    .admin-overview-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .admin-overview-stats .stat-card { min-width: 0; overflow-wrap: anywhere; }
+    .admin-overview-stats .stat-caption { overflow-wrap: anywhere; }
+    .admin-overview-directory { padding-right: 12px; padding-left: 12px; }
+    .admin-overview-directory .admin-table-scroll { overflow: visible; }
+    .admin-overview-directory .admin-table { display: block; width: 100%; min-width: 0; table-layout: fixed; }
+    .admin-overview-directory .admin-table thead { display: none; }
+    .admin-overview-directory .admin-table tbody { display: grid; gap: 10px; width: 100%; min-width: 0; }
+    .admin-overview-directory .admin-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; align-items: start; gap: 2px 14px; width: 100%; min-width: 0; padding: 8px 12px 4px; border: 1px solid var(--line); border-radius: 5px; background: #fff; }
+    .admin-overview-directory .admin-table tbody td { display: grid; grid-template-rows: auto auto; align-content: start; gap: 4px; min-width: 0; padding: 8px 2px; border: 0; overflow-wrap: anywhere; }
+    .admin-overview-directory .admin-table tbody td::before { color: var(--muted); content: attr(data-label); font-size: 10px; font-weight: 700; }
+    .admin-overview-directory .admin-table tbody td:first-child { grid-column: 1 / -1; padding: 4px 2px 10px; border-bottom: 1px solid #edf1ed; }
+    .admin-overview-directory .admin-table tbody td:nth-child(2) { grid-column: 1; }
+    .admin-overview-directory .admin-table tbody td:nth-child(3) { grid-column: 2; }
+    .admin-overview-directory .admin-table tbody td:nth-child(4) { grid-column: 1; }
+    .admin-overview-directory .admin-table tbody td:nth-child(5) { grid-column: 2; }
+    .admin-overview-directory .admin-table tbody td:nth-child(2) .role-badge { justify-self: start; }
+    .admin-overview-directory .admin-table tbody td:last-child { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; gap: 10px; margin-top: 3px; padding: 10px 2px 4px; border-top: 1px solid #edf1ed; }
+    .admin-overview-directory .admin-table tbody td:last-child::before { flex: 0 0 auto; }
+    .admin-overview-directory .admin-view-button { max-width: 100%; white-space: normal; }
+}
