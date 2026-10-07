@@ -185,7 +185,7 @@ h1 span { color: var(--green); }
 .password-visibility-toggle:focus-visible { box-shadow: inset 0 0 0 2px var(--green); }
 .password-visibility-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .password-eye-slash { display: none; }
-.password-visibility-toggle[aria-pressed="true"] .password-eye-slash { display: block; }
+.password-visibility-toggle[aria-pressed="false"] .password-eye-slash { display: block; }
 
 @media (max-width: 760px) {
     .desktop-topbar {
