@@ -11,7 +11,7 @@
         <form class="stack-form" method="post" action="<?= e(url('/signup')) ?>" data-password-confirmation>
             <?= csrf_field() ?>
             <label for="name">Your name</label>
-            <input id="name" name="name" type="text" minlength="2" maxlength="100" autocomplete="name" required>
+            <input id="name" name="name" type="text" minlength="2" maxlength="100" pattern="\p{L}+(?: +\p{L}*)*" title="Use letters only, with spaces between names." autocomplete="name" required>
             <label for="email">Email address</label>
             <input id="email" name="email" type="email" maxlength="190" autocomplete="email" required>
             <label for="password">Password</label>

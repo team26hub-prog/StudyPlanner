@@ -42,7 +42,7 @@ final class ExamController extends Controller
         $attributes['user_id'] = (int) $user['id'];
         (new Exam())->create($attributes);
         (new ActivityLog())->record($user, 'exam.created', "Created exam: {$attributes['title']}.");
-        flash('notice', 'Exam added to your schedule.');
+        flash('success', 'Exam added successfully.');
         redirect('/exams');
     }
 

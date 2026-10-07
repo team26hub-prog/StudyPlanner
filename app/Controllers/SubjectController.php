@@ -38,7 +38,7 @@ final class SubjectController extends Controller
         $attributes['user_id'] = $user['id'];
         (new Subject())->create($attributes);
         (new ActivityLog())->record($user, 'subject.created', "Created subject: {$attributes['name']}.");
-        flash('notice', 'Subject added.');
+        flash('success', 'Subject added successfully.');
         redirect('/subjects');
     }
 

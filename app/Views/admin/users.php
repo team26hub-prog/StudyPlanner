@@ -10,12 +10,15 @@
     <details class="admin-create-user"<?= $error ? ' open' : '' ?>>
         <summary class="primary-button">Add User</summary>
         <section class="content-section admin-create-user-form">
-        <div class="section-heading"><div><p class="eyebrow">NEW ACCOUNT</p><h2>Add a user</h2></div></div>
+        <div class="section-heading admin-create-user-heading">
+            <div><p class="eyebrow">NEW ACCOUNT</p><h2>Add a user</h2></div>
+            <button class="admin-create-user-close" type="button" data-close-create-user="<?= e(url('/admin')) ?>" aria-label="Close Add User form">×</button>
+        </div>
         <?php if ($error): ?><p class="error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
         <form class="editor-form" method="post" action="<?= e(url('/admin/users')) ?>" data-password-confirmation>
             <?= csrf_field() ?>
             <label for="name">Name</label>
-            <input id="name" name="name" type="text" minlength="2" maxlength="100" autocomplete="name" required>
+            <input id="name" name="name" type="text" minlength="2" maxlength="100" pattern="\p{L}+(?: +\p{L}*)*" title="Use letters only, with spaces between names." autocomplete="name" required>
             <label for="email">Email</label>
             <input id="email" name="email" type="email" maxlength="190" autocomplete="email" required>
             <label for="password">Temporary password</label>
@@ -44,9 +47,9 @@
                                 <td><span class="role-badge role-<?= e($user['role']) ?>"><?= e(ucfirst($user['role'])) ?></span></td>
                                 <td>
                                     <?php if ($user['role'] === 'user'): ?>
-                                        <form method="post" action="<?= e(url('/admin/users/' . $user['id'] . '/delete')) ?>" onsubmit="return confirm('Delete this account and all of its study data?')">
+                                        <form method="post" action="<?= e(url('/admin/users/' . $user['id'] . '/delete')) ?>" data-swal-confirm="Delete this account and all of its study data?">
                                             <?= csrf_field() ?>
-                                            <button class="danger-button admin-delete-button" type="submit">Delete</button>
+                                            <button class="danger-button admin-delete-button" type="submit">Delete User</button>
                                         </form>
                                     <?php else: ?>
                                         <span class="muted-copy">Protected</span>

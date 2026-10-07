@@ -8,15 +8,48 @@ class Controller
 {
     protected function render(string $view, array $data = []): void
     {
+        if (preg_match('#\A[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*\z#', $view) !== 1) {
+            http_response_code(500);
+            echo 'Unable to render page.';
+            return;
+        }
+
+        $viewsDirectory = dirname(__DIR__) . '/Views';
+        $viewFile = $viewsDirectory . '/' . $view . '.php';
+        $layoutFile = $viewsDirectory . '/layout.php';
+        if (!is_file($viewFile) || !is_file($layoutFile)) {
+            error_log('Page rendering failed: view or layout file is missing.');
+            http_response_code(500);
+            echo 'Unable to render page.';
+            return;
+        }
+
         $data['currentUser'] = current_user();
-        $data['notice'] = flash('notice');
-        $data['success'] = $data['success'] ?? flash('success');
-        $data['error'] = $data['error'] ?? flash('error');
+        $flashError = flash('error');
+        $flashedMessages = [
+            'notice' => flash('notice'),
+            'success' => flash('success'),
+            'error' => $flashError,
+        ];
+        $data['flashError'] = $data['flashError'] ?? $flashError;
+        foreach ($flashedMessages as $key => $message) {
+            $data[$key] = $data[$key] ?? $message;
+        }
+
         extract($data, EXTR_SKIP);
+        $bufferLevel = ob_get_level();
         ob_start();
-        require dirname(__DIR__) . '/Views/' . $view . '.php';
-        $content = ob_get_clean();
-        require dirname(__DIR__) . '/Views/layout.php';
+        try {
+            require $viewFile;
+            $content = (string) ob_get_clean();
+        } catch (\Throwable $exception) {
+            while (ob_get_level() > $bufferLevel) {
+                ob_end_clean();
+            }
+            throw $exception;
+        }
+
+        require $layoutFile;
     }
 
     protected function requireAuth(): array

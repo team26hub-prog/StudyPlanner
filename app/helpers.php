@@ -31,6 +31,13 @@ function text_length(string $value): int
     return strlen($value);
 }
 
+function is_valid_person_name(string $value): bool
+{
+    $value = trim($value, ' ');
+
+    return preg_match('/\A\p{L}+(?: +\p{L}+)*\z/u', $value) === 1;
+}
+
 function sanitize_email_value(?string $value): string
 {
     return strtolower(trim((string) filter_var($value ?? '', FILTER_SANITIZE_EMAIL)));

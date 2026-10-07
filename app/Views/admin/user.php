@@ -1,3 +1,7 @@
+<a class="back-button admin-account-back" href="<?= e(url('/admin')) ?>" data-history-back aria-label="Back to admin overview">
+    <span aria-hidden="true">←</span>
+</a>
+
 <section class="page-heading compact-heading">
     <div>
         <p class="eyebrow">ACCOUNT DETAILS</p>

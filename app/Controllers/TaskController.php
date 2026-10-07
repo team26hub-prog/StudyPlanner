@@ -49,7 +49,7 @@ final class TaskController extends Controller
         $attributes['user_id'] = $user['id'];
         (new Task())->create($attributes);
         (new ActivityLog())->record($user, 'task.created', "Created task: {$attributes['title']}.");
-        flash('notice', 'Task added to your plan.');
+        flash('success', 'Task added successfully.');
         redirect('/tasks');
     }
 

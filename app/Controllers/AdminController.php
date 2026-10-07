@@ -50,13 +50,18 @@ final class AdminController extends Controller
         $admin = $this->requireRole('admin');
         $this->requireCsrf();
 
-        $name = sanitize_text_value(input_string($_POST, 'name'));
+        $nameInput = input_string($_POST, 'name');
+        $name = sanitize_text_value($nameInput);
         $email = input_email($_POST, 'email');
         $password = input_password($_POST, 'password');
         $passwordConfirmation = input_password($_POST, 'password_confirmation');
 
         if (text_length($name) < 2 || text_length($name) > 100) {
             flash('error', 'Enter a name between 2 and 100 characters.');
+            redirect('/admin/manage-users');
+        }
+        if (!is_valid_person_name($nameInput)) {
+            flash('error', 'Name must contain letters only, with spaces between names.');
             redirect('/admin/manage-users');
         }
         if ($email === '' || text_length($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -80,7 +85,7 @@ final class AdminController extends Controller
 
         $users->create($name, $email, $password);
         (new ActivityLog())->record($admin, 'user.created', "Created user account {$name} ({$email}).");
-        flash('notice', 'User account created.');
+        flash('success', 'User created successfully.');
         redirect('/admin/manage-users');
     }
 
@@ -98,7 +103,7 @@ final class AdminController extends Controller
 
         $users->deleteUser((int) $target['id']);
         (new ActivityLog())->record($admin, 'user.deleted', "Deleted user account {$target['name']} ({$target['email']}).");
-        flash('notice', 'User account and its study data deleted.');
+        flash('success', 'User deleted successfully.');
         redirect('/admin/manage-users');
     }
 

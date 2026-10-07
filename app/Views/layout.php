@@ -6,7 +6,7 @@
     <title>StudyPlanner</title>
     <link rel="stylesheet" href="<?= e(url('/public/assets/css/app.css')) ?>">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-    <script src="<?= e(url('/public/assets/js/app.js')) ?>" defer></script>
+    <script src="<?= e(url('/public/assets/js/app.js')) ?>?v=<?= (int) filemtime(dirname(__DIR__, 2) . '/public/assets/js/app.js') ?>" defer></script>
 </head>
     <?php
     $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -15,6 +15,14 @@
     $currentPath = $currentPath === '//' ? '/' : $currentPath;
     $isAdmin = ($currentUser['role'] ?? null) === 'admin';
     $autoDismissNotice = $notice === 'You have signed out.';
+    $successTitle = match ($success) {
+        'Your account has been created successfully.' => 'Account created',
+        'You have signed in successfully.' => 'Signed in',
+        'You have signed out successfully.' => 'Signed out',
+        'User created successfully.' => 'User created',
+        'User deleted successfully.' => 'User deleted',
+        default => 'Success',
+    };
     ?>
 <body<?= $isAdmin ? ' class="admin-page"' : '' ?>>
     <?php if ($currentUser): ?>
@@ -101,7 +109,8 @@
                 </aside>
                     <div class="admin-content">
                         <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
-                        <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
+                        <?php if ($success): ?><p class="notice-message" role="status" data-swal-success data-swal-title="<?= e($successTitle) ?>"><?= e($success) ?></p><?php endif; ?>
+                        <?php if ($flashError): ?><p class="error-message" role="alert" data-swal-error><?= e($flashError) ?></p><?php endif; ?>
                         <?= $content ?>
                     </div>
             </div>
@@ -134,7 +143,8 @@
                 </aside>
                 <div class="app-content">
                     <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
-                    <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
+                    <?php if ($success): ?><p class="notice-message" role="status" data-swal-success data-swal-title="<?= e($successTitle) ?>"><?= e($success) ?></p><?php endif; ?>
+                    <?php if ($flashError): ?><p class="error-message" role="alert" data-swal-error><?= e($flashError) ?></p><?php endif; ?>
                     <?= $content ?>
                 </div>
             </div>
@@ -146,7 +156,8 @@
             </nav>
         <?php else: ?>
                 <?php if ($notice): ?><p class="notice-message" role="status"<?= $autoDismissNotice ? ' data-auto-dismiss="3000"' : '' ?>><?= e($notice) ?></p><?php endif; ?>
-                <?php if ($success): ?><p class="notice-message" role="status" data-swal-success><?= e($success) ?></p><?php endif; ?>
+                <?php if ($success): ?><p class="notice-message" role="status" data-swal-success data-swal-title="<?= e($successTitle) ?>"><?= e($success) ?></p><?php endif; ?>
+                <?php if ($flashError): ?><p class="error-message" role="alert" data-swal-error><?= e($flashError) ?></p><?php endif; ?>
             <?= $content ?>
         <?php endif; ?>
     </main>

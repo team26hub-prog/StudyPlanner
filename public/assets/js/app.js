@@ -1,3 +1,29 @@
+document.querySelectorAll('form[data-swal-confirm]').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        let confirmed = false;
+
+        if (window.Swal) {
+            const result = await window.Swal.fire({
+                icon: 'warning',
+                title: 'Do you want to delete this user?',
+                text: form.dataset.swalConfirm,
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#c94f43',
+                cancelButtonColor: '#73817c',
+                reverseButtons: true
+            });
+            confirmed = result.isConfirmed;
+        } else {
+            confirmed = window.confirm(form.dataset.swalConfirm || 'Delete this user?');
+        }
+
+        if (confirmed) HTMLFormElement.prototype.submit.call(form);
+    });
+});
+
 document.querySelectorAll('[data-confirm]').forEach((button) => {
     button.closest('form')?.addEventListener('submit', (event) => {
         if (!window.confirm(button.dataset.confirm)) {
@@ -25,6 +51,54 @@ document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
         field.type = showing ? 'text' : 'password';
         toggle.setAttribute('aria-pressed', String(showing));
         toggle.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+    });
+});
+
+const returnToPreviousPage = (fallbackHref) => {
+    const destination = new URL(fallbackHref, window.location.href);
+    if (document.referrer && window.history.length > 1) {
+        try {
+            const previousPage = new URL(document.referrer);
+            if (previousPage.origin === window.location.origin && previousPage.pathname === destination.pathname) {
+                window.history.back();
+                return;
+            }
+        } catch {
+            // Use the overview fallback when the referrer cannot be parsed.
+        }
+    }
+    window.location.assign(destination.href);
+};
+
+document.querySelectorAll('[data-history-back]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        returnToPreviousPage(link.href);
+    });
+});
+
+document.querySelectorAll('[data-close-create-user]').forEach((button) => {
+    button.addEventListener('click', async () => {
+        let confirmed = false;
+        if (window.Swal) {
+            const result = await window.Swal.fire({
+                icon: 'question',
+                title: 'Leave New Account form?',
+                text: 'Your unsaved account information will be lost.',
+                showCancelButton: true,
+                confirmButtonText: 'Leave form',
+                cancelButtonText: 'Stay here',
+                confirmButtonColor: '#23775f',
+                cancelButtonColor: '#73817c',
+                reverseButtons: true
+            });
+            confirmed = result.isConfirmed;
+        } else {
+            confirmed = window.confirm('Leave the New Account form? Your unsaved information will be lost.');
+        }
+
+        if (confirmed) returnToPreviousPage(button.dataset.closeCreateUser);
     });
 });
 
@@ -157,7 +231,7 @@ document.querySelectorAll('form').forEach((form) => {
     });
 });
 
-const serverError = document.querySelector('.error-message[role="alert"]');
+const serverError = document.querySelector('.error-message[role="alert"], [data-swal-error]');
 if (serverError?.textContent.trim()) {
     const message = serverError.textContent.trim();
     if (window.Swal) {
@@ -172,13 +246,13 @@ if (serverError?.textContent.trim()) {
     }
 }
 
-const signupSuccess = document.querySelector('[data-swal-success]');
-if (signupSuccess?.textContent.trim() && window.Swal) {
-    signupSuccess.hidden = true;
+const successNotice = document.querySelector('[data-swal-success]');
+if (successNotice?.textContent.trim() && window.Swal) {
+    successNotice.hidden = true;
     window.Swal.fire({
         icon: 'success',
-        title: 'Account created',
-        text: signupSuccess.textContent.trim(),
+        title: successNotice.dataset.swalTitle || 'Success',
+        text: successNotice.textContent.trim(),
         confirmButtonText: 'Continue',
         confirmButtonColor: '#23775f'
     });

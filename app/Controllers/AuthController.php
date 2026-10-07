@@ -52,6 +52,7 @@ final class AuthController extends Controller
             'role' => $user['role'],
         ];
         (new ActivityLog())->record($_SESSION['user'], 'auth.login', 'Signed in.');
+        flash('success', 'You have signed in successfully.');
         redirect($user['role'] === 'admin' ? '/admin' : '/');
     }
 
@@ -66,13 +67,18 @@ final class AuthController extends Controller
         $this->requireGuest();
         $this->requireCsrf();
 
-        $name = sanitize_text_value(input_string($_POST, 'name'));
+        $nameInput = input_string($_POST, 'name');
+        $name = sanitize_text_value($nameInput);
         $email = input_email($_POST, 'email');
         $password = input_password($_POST, 'password');
         $passwordConfirmation = input_password($_POST, 'password_confirmation');
 
         if (text_length($name) < 2 || text_length($name) > 100) {
             $this->render('auth/register', ['error' => 'Enter a name between 2 and 100 characters.']);
+            return;
+        }
+        if (!is_valid_person_name($nameInput)) {
+            $this->render('auth/register', ['error' => 'Name must contain letters only, with spaces between names.']);
             return;
         }
         if ($email === '' || text_length($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -114,7 +120,7 @@ final class AuthController extends Controller
         (new ActivityLog())->record($user, 'auth.logout', 'Signed out.');
         $_SESSION = [];
         session_regenerate_id(true);
-        flash('notice', 'You have signed out.');
+        flash('success', 'You have signed out successfully.');
         redirect('/login');
     }
 }
