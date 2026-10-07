@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH="$HOME/studyplanner.betabox.cx/"
+    - /bin/mkdir -p "$DEPLOYPATH"
+    - /bin/cp -R app config routes public "$DEPLOYPATH"
+    - /bin/cp index.php .htaccess "$DEPLOYPATH"
