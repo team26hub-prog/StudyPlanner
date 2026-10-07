@@ -6,8 +6,10 @@
     </div>
 </section>
 
-<div class="admin-detail-grid admin-manage-grid">
-    <section class="content-section">
+<div class="admin-users-page">
+    <details class="admin-create-user"<?= $error ? ' open' : '' ?>>
+        <summary class="primary-button">Add User</summary>
+        <section class="content-section admin-create-user-form">
         <div class="section-heading"><div><p class="eyebrow">NEW ACCOUNT</p><h2>Add a user</h2></div></div>
         <?php if ($error): ?><p class="error-message" role="alert"><?= e($error) ?></p><?php endif; ?>
         <form class="editor-form" method="post" action="<?= e(url('/admin/users')) ?>" data-password-confirmation>
@@ -24,9 +26,10 @@
             <p class="form-footnote">The password is stored as a secure hash. The new account will have the standard user role.</p>
             <div class="form-actions"><button class="primary-button" type="submit">Create user</button></div>
         </form>
-    </section>
+        </section>
+    </details>
 
-    <section class="content-section">
+    <section class="content-section admin-user-directory">
         <div class="section-heading"><div><p class="eyebrow">ACCOUNT DIRECTORY</p><h2><?= count($users) ?> <?= count($users) === 1 ? 'account' : 'accounts' ?></h2></div></div>
         <?php if ($users === []): ?>
             <div class="empty-state compact-empty"><h3>No accounts yet</h3><p>Accounts will appear here after creation.</p></div>

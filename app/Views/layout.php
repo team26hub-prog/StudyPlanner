@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="<?= e(url('/public/assets/js/app.js')) ?>" defer></script>
 </head>
-<body>
     <?php
     $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
     $scriptBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
@@ -17,6 +16,7 @@
     $isAdmin = ($currentUser['role'] ?? null) === 'admin';
     $autoDismissNotice = $notice === 'You have signed out.';
     ?>
+<body<?= $isAdmin ? ' class="admin-page"' : '' ?>>
     <?php if ($currentUser): ?>
         <header class="topbar<?= $isAdmin ? ' admin-header' : ' app-header' ?>">
             <?php if ($isAdmin): ?>

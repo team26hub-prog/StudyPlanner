@@ -1,4 +1,4 @@
-<section class="page-heading compact-heading">
+<section class="page-heading compact-heading admin-activity-heading">
     <div>
         <p class="eyebrow">ADMINISTRATION</p>
         <h1>Activity <span>log.</span></h1>
@@ -17,10 +17,10 @@
                 <tbody>
                     <?php foreach ($activities as $activity): ?>
                         <tr>
-                            <td class="admin-activity-date"><?= e(date('M j, Y g:i a', strtotime($activity['created_at']))) ?></td>
-                            <td><?= e($activity['actor_name']) ?></td>
-                            <td><span class="role-badge"><?= e(ucwords(str_replace(['.', '_'], ' ', $activity['event']))) ?></span></td>
-                            <td><?= e($activity['description']) ?></td>
+                            <td class="admin-activity-date" data-label="When"><?= e(date('M j, Y g:i a', strtotime($activity['created_at']))) ?></td>
+                            <td data-label="Account"><?= e($activity['actor_name']) ?></td>
+                            <td data-label="Event"><span class="role-badge"><?= e(ucwords(str_replace(['.', '_'], ' ', $activity['event']))) ?></span></td>
+                            <td data-label="Details"><?= e($activity['description']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
